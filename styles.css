@@ -1,0 +1,643 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    isolation: isolate;
+}
+
+/* Fondo UNEFA — sutilmente visible, no estorba */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url('bg_nuevo.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 1;
+    z-index: -1;
+    pointer-events: none;
+}
+
+
+/* ── Select ── */
+.select-unefa {
+    appearance: none;
+    background-color: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #111827;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.6rem center;
+    background-repeat: no-repeat;
+    background-size: 1.4em 1.4em;
+    width: 100%;
+}
+
+.select-unefa:focus {
+    border-color: #0a3066;
+    box-shadow: 0 0 0 2px rgba(10, 48, 102, 0.15);
+}
+
+.select-unefa:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Grilla Profesor ── */
+.schedule-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.time-cell {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6b7280;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.slot-cell {
+    border: 1px solid #e5e7eb;
+    padding: 3px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.slot-btn {
+    width: 100%;
+    height: 100%;
+    min-height: 34px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    font-size: 0.65rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+.slot-btn.state-free {
+    background-color: #f0fdf4;
+    border: 1.5px dashed #86efac;
+    color: #16a34a;
+}
+
+.slot-btn.state-free:hover {
+    background-color: #22c55e;
+    border-color: #16a34a;
+    border-style: solid;
+    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
+}
+
+.slot-btn.state-mine {
+    background-color: #0a3066;
+    border: 1.5px solid #062044;
+    color: white;
+    box-shadow: 0 2px 6px rgba(10, 48, 102, 0.35);
+}
+
+.slot-btn.state-mine:hover {
+    background-color: #b91c1c;
+    border-color: #991b1b;
+}
+
+.slot-btn.state-taken {
+    background-color: #fef2f2;
+    border: 1.5px solid #fca5a5;
+    color: #dc2626;
+    cursor: not-allowed;
+    opacity: 0.85;
+    font-size: 0.6rem;
+}
+
+/* Texto de materia dentro de cada celda */
+.slot-materia-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+    word-break: break-word;
+    font-size: 0.6rem;
+    width: 100%;
+    text-align: center;
+    padding: 0 2px;
+}
+
+.schedule-table tbody tr:nth-child(even) .time-cell,
+.schedule-table tbody tr:nth-child(even) .slot-cell {
+    background-color: rgba(0, 0, 0, 0.012);
+}
+
+/* ── Grilla Admin (estilo institucional) ── */
+.admin-th {
+    background-color: #bfcfe8;
+    border: 1.5px solid #7a9cc5;
+    padding: 8px 6px;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #0a3066;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.admin-th-sm {
+    background-color: #bfcfe8;
+    border: 1.5px solid #7a9cc5;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #0a3066;
+    text-transform: uppercase;
+}
+
+.admin-td-time {
+    background-color: #f8fafc;
+    border: 1px solid #c3d5e8;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.admin-td-turno {
+    background-color: #dce8f5;
+    border: 1px solid #c3d5e8;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #0a3066;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.admin-td-slot {
+    border: 1px solid #c3d5e8;
+    padding: 4px 6px;
+    font-size: 0.65rem;
+    text-align: center;
+    font-weight: 600;
+    min-width: 90px;
+    vertical-align: middle;
+}
+
+.admin-td-slot.occupied {
+    background-color: #dce8f5;
+    color: #0a3066;
+    vertical-align: middle;
+}
+
+.admin-td-slot.free {
+    background-color: #ffffff;
+}
+
+/* Materia en grande + profesor en pequeño dentro de celda admin */
+.admin-slot-materia {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #0a3066;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.admin-slot-prof {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 500;
+    color: #4b6a99;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.admin-td-sm {
+    border: 1px solid #c3d5e8;
+    padding: 5px 8px;
+    font-size: 0.65rem;
+    text-align: center;
+    background-color: #f0f6ff;
+}
+
+/* Columna de materia en tabla resumen (4 cols) */
+#admin-summary-body tr:nth-child(even) td {
+    background-color: #dce8f5;
+}
+
+/* Filas alternas en resumen */
+#admin-summary-body tr:nth-child(even) td {
+    background-color: #dce8f5;
+}
+
+/* ══════════════════════════════════
+   SISTEMA DE ANIMACIONES
+══════════════════════════════════ */
+
+/* ── fadeIn básico ── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* ── Header: deslizarse desde arriba ── */
+@keyframes headerSlideDown {
+    from { opacity: 0; transform: translateY(-100%); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+header {
+    animation: headerSlideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Logos: flotación suave y continua ── */
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33%       { transform: translateY(-4px) rotate(0.5deg); }
+    66%       { transform: translateY(2px) rotate(-0.5deg); }
+}
+header img {
+    animation: floatLogo 5s ease-in-out infinite;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+header img:hover {
+    filter: drop-shadow(0 4px 16px rgba(220,166,61,0.7)) brightness(1.15) !important;
+    transform: scale(1.1) rotate(3deg) !important;
+    animation-play-state: paused;
+}
+
+/* ── Título del header: shimmer sweep ── */
+@keyframes shimmerText {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+header h1 {
+    background: linear-gradient(
+        90deg,
+        #ffffff 30%,
+        #dca63d 50%,
+        #ffffff 70%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmerText 4s linear infinite;
+}
+
+/* ── Subtítulo header: parpadeo suave ── */
+@keyframes pulseSub {
+    0%, 100% { opacity: 0.9; }
+    50%       { opacity: 0.5; }
+}
+header p {
+    animation: pulseSub 3s ease-in-out infinite;
+}
+
+/* ── Línea dorada del header: expand ── */
+@keyframes borderGrow {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+header {
+    transform-origin: left;
+}
+
+/* ── Login card: bounce-in desde abajo ── */
+@keyframes bounceIn {
+    0%   { opacity: 0; transform: translateY(60px) scale(0.92); }
+    60%  { opacity: 1; transform: translateY(-8px) scale(1.02); }
+    80%  { transform: translateY(4px) scale(0.99); }
+    100% { transform: translateY(0) scale(1); }
+}
+#view-login > div {
+    animation: bounceIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Inputs: resaltar al enfocar con suave expansión ── */
+#view-login input {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+#view-login input:focus {
+    transform: scale(1.015);
+}
+
+/* ── Botón login: press + ripple ── */
+#form-login button[type="submit"] {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease;
+}
+#form-login button[type="submit"]:active {
+    transform: scale(0.97);
+}
+#form-login button[type="submit"]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#form-login button[type="submit"]:hover::after {
+    opacity: 1;
+}
+
+/* ── Paneles del dashboard: slide-up al entrar ── */
+@keyframes slideUpPanel {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+#view-dashboard > div > div:first-child > div:nth-child(1) { animation: slideUpPanel 0.4s ease-out forwards; }
+#view-dashboard > div > div:first-child > div:nth-child(2) { animation: slideUpPanel 0.4s ease-out 0.08s forwards; }
+#view-dashboard > div > div:first-child > div:nth-child(3) { animation: slideUpPanel 0.4s ease-out 0.16s forwards; }
+#view-dashboard > div > div:last-child  > div:nth-child(1) { animation: slideUpPanel 0.4s ease-out 0.06s forwards; }
+#view-dashboard > div > div:last-child  > div:nth-child(2) { animation: slideUpPanel 0.4s ease-out 0.14s forwards; }
+#view-dashboard > div > div:last-child  > div:nth-child(3) { animation: slideUpPanel 0.4s ease-out 0.22s forwards; }
+
+/* ── Celdas de la grilla: pop al aparecer ── */
+@keyframes cellPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.slot-btn {
+    animation: cellPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Hover premium en slot libre ── */
+.slot-btn.state-free {
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+}
+.slot-btn.state-free:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.45) !important;
+}
+
+/* ── Hover en slot reservado (mío): shake al pasar ── */
+@keyframes shakeSlot {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-3px); }
+    75%       { transform: translateX(3px); }
+}
+.slot-btn.state-mine:hover {
+    animation: shakeSlot 0.35s ease-in-out;
+}
+
+/* ── Fila de resumen admin: highlight al hover ── */
+#admin-summary-body tr {
+    transition: background-color 0.2s ease;
+}
+#admin-summary-body tr:hover td {
+    background-color: #bfcfe8 !important;
+    transition: background-color 0.2s ease;
+}
+
+/* ── Botones generales: lift on hover ── */
+button:not(.slot-btn):not(.btn-admin-free) {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.2s ease, color 0.2s ease;
+}
+button:not(.slot-btn):not(.btn-admin-free):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+button:not(.slot-btn):not(.btn-admin-free):active {
+    transform: translateY(0px) scale(0.98);
+}
+
+/* ══════════════════════════════════
+   ✅ MEJORA 1: Toast Notifications
+══════════════════════════════════ */
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #22c55e;
+    min-width: 260px;
+    max-width: 360px;
+    pointer-events: all;
+    animation: toastSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.4;
+}
+
+.toast.toast-error {
+    border-left-color: #ef4444;
+}
+
+.toast.toast-warning {
+    border-left-color: #f59e0b;
+}
+
+.toast.toast-info {
+    border-left-color: #3b82f6;
+}
+
+.toast-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.toast-msg {
+    flex: 1;
+}
+
+.toast-sub {
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.toast.hiding {
+    animation: toastFade 0.3s ease-in forwards;
+}
+
+@keyframes toastSlide {
+    from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastFade {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(60%) scale(0.95);
+    }
+}
+
+/* ══════════════════════════════════
+   ✅ MEJORA 3: Liberar slot en Admin
+══════════════════════════════════ */
+.admin-td-slot .btn-admin-free {
+    display: none;
+    margin-top: 4px;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.admin-td-slot:hover .btn-admin-free {
+    display: block;
+}
+
+.admin-td-slot .btn-admin-free:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #dc2626;
+}
+
+/* ══════════════════════════════════════════════
+   PERSONALIZACIÓN AVANZADA
+══════════════════════════════════════════════ */
+
+/* ── Modo Oscuro ── */
+body.dark-mode { background-color: #0f172a !important; color: #f1f5f9 !important; }
+body.dark-mode .bg-white          { background-color: #1e293b !important; }
+body.dark-mode .bg-slate-100      { background-color: #0f172a !important; }
+body.dark-mode .bg-gray-50        { background-color: #0f172a !important; }
+body.dark-mode .bg-gray-100       { background-color: #1e293b !important; }
+body.dark-mode .bg-gray-200       { background-color: #334155 !important; }
+body.dark-mode .border-gray-200   { border-color: #334155 !important; }
+body.dark-mode .border-gray-100   { border-color: #334155 !important; }
+body.dark-mode .text-gray-800     { color: #f1f5f9 !important; }
+body.dark-mode .text-gray-700     { color: #cbd5e1 !important; }
+body.dark-mode .text-gray-600     { color: #94a3b8 !important; }
+body.dark-mode .text-gray-500     { color: #64748b !important; }
+body.dark-mode .text-gray-400     { color: #475569 !important; }
+body.dark-mode .shadow-md,
+body.dark-mode .shadow-xl         { box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important; }
+body.dark-mode .bg-blue-50        { background-color: #1e3a5f !important; }
+body.dark-mode .text-blue-700     { color: #93c5fd !important; }
+body.dark-mode .bg-green-100      { background-color: #052e16 !important; }
+body.dark-mode .text-green-700    { color: #86efac !important; }
+body.dark-mode .select-unefa      { background-color: #0f172a; color: #f1f5f9; border-color: #334155; }
+body.dark-mode .time-cell         { background-color: #1e293b !important; color: #94a3b8 !important; border-color: #334155 !important; }
+body.dark-mode .slot-cell         { border-color: #334155 !important; }
+body.dark-mode input              { background-color: #0f172a !important; color: #f1f5f9 !important; border-color: #334155 !important; }
+body.dark-mode .admin-th,
+body.dark-mode .admin-th-sm       { background-color: #1e3a5f !important; color: #93c5fd !important; border-color: #334155 !important; }
+body.dark-mode .admin-td-slot,
+body.dark-mode .admin-td-time,
+body.dark-mode .admin-td-turno,
+body.dark-mode .admin-td-sm      { border-color: #334155 !important; }
+body.dark-mode .admin-td-turno   { background-color: #1e293b !important; }
+body.dark-mode .admin-td-slot.occupied { background-color: #1e3a5f !important; }
+body.dark-mode #progress-bar-wrap .bg-gray-100 { background-color: #334155 !important; }
+
+/* ── Botón dark mode ── */
+#btn-dark-mode { transition: transform 0.3s ease, background-color 0.2s; }
+#btn-dark-mode:hover { transform: rotate(20deg) scale(1.15); }
+
+/* ── Reloj ── */
+#clock-time { font-feature-settings: "tnum"; }
+
+/* ── Temas por carrera ── */
+body.theme-enfermeria    .bg-unefablue { background-color: #7c3aed !important; }
+body.theme-enfermeria    .text-unefablue { color: #7c3aed !important; }
+body.theme-enfermeria    .border-unefagold { border-color: #a78bfa !important; }
+body.theme-enfermeria    .slot-btn.state-mine { background-color: #7c3aed !important; border-color: #6d28d9 !important; }
+body.theme-administracion .bg-unefablue { background-color: #065f46 !important; }
+body.theme-administracion .text-unefablue { color: #065f46 !important; }
+body.theme-administracion .border-unefagold { border-color: #34d399 !important; }
+body.theme-administracion .slot-btn.state-mine { background-color: #065f46 !important; border-color: #064e3b !important; }
+
+/* ── Barra de Progreso ── */
+#progress-bar-fill {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative; overflow: hidden;
+}
+#progress-bar-fill::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmerBar 2s infinite;
+}
+@keyframes shimmerBar { from { left: -60%; } to { left: 120%; } }
+
+/* ── Avatar ── */
+#user-avatar-circle { transition: transform 0.3s ease; }
+#user-avatar-circle:hover { transform: scale(1.1) rotate(5deg); }
+
+/* ── Skeleton loaders ── */
+@keyframes skeletonShimmer {
+    from { background-position: 200% center; }
+    to   { background-position: -200% center; }
+}
+.skeleton-cell {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease infinite;
+    border-radius: 5px; min-height: 34px; width: 100%;
+}
+body.dark-mode .skeleton-cell {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+}
+
+/* ── Cursor personalizado ── */
+.slot-btn.state-free { cursor: crosshair; }
+
+/* ── Título editable ── */
+#header-title-text[contenteditable="true"] {
+    outline: 2px dashed rgba(220,166,61,0.7); outline-offset: 4px;
+    border-radius: 4px; padding: 2px 8px; cursor: text;
+}
+.custom-scrollbar::-webkit-scrollbar { width: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 4px; }
+
+/* -- Optimizacion Movil -- */
+.mobile-scroll { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+@media (max-width: 768px) {
+  .schedule-table th, .schedule-table td { padding: 0.25rem 0.125rem !important; font-size: 0.65rem !important; }
+  .slot-btn { min-height: 44px; font-size: 0.7rem; }
+  .toast { padding: 12px; }
+  #view-dashboard { padding: 8px; gap: 12px; }
+}

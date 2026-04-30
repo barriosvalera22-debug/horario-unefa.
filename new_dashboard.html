@@ -1,0 +1,309 @@
+    <!-- ═══════════════ DASHBOARD ═══════════════ -->
+    <main id="view-dashboard"
+        class="hidden flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 gap-6 flex-col animate-fade-in">
+        
+        <!-- ── BARRA SUPERIOR: Filtros y Perfil ── -->
+        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-visible flex flex-col md:flex-row items-center justify-between p-4 gap-4 w-full">
+            
+            <div class="flex items-center gap-4 flex-wrap w-full md:w-auto z-10">
+                <div class="flex flex-col relative">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1">Carrera</label>
+                    <select id="shared-select-career" class="select-unefa min-w-[200px] w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue">
+                        <option value="" disabled selected>-- Seleccionar --</option>
+                        <option value="sistemas">Ingeniería de Sistemas</option>
+                        <option value="enfermeria">Enfermería</option>
+                        <option value="administracion">Administración y G.M.</option>
+                    </select>
+                </div>
+                <div class="flex flex-col relative">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1">Semestre</label>
+                    <select id="shared-select-semester" class="select-unefa min-w-[150px] w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" disabled>
+                        <option value="" disabled selected>-- Elige carrera --</option>
+                    </select>
+                </div>
+                <div class="flex flex-col relative">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1">Sección</label>
+                    <select id="shared-select-section" class="select-unefa min-w-[150px] w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" disabled>
+                        <option value="" disabled selected>-- Elige semestre --</option>
+                    </select>
+                </div>
+                
+                <!-- Botones adicionales Admin -->
+                <div class="flex items-end gap-2 h-full mt-5">
+                    <button id="btn-admin-view-schedule" disabled
+                        class="hidden bg-unefablue hover:bg-unefablueHover text-white font-bold py-2 px-4 rounded-lg transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed items-center justify-center gap-2 h-[38px]">
+                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        Ver Horario
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 ml-auto border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-4 w-full md:w-auto justify-end">
+                <div class="text-right flex flex-col justify-center">
+                    <h3 class="text-sm font-extrabold text-unefablue leading-tight" id="profile-name">—</h3>
+                    <p class="text-[10px] font-bold text-unefagold uppercase tracking-wider" id="profile-role">Activo</p>
+                </div>
+                <div id="user-avatar-circle" class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-unefagold shadow-sm flex items-center justify-center text-gray-400 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                </div>
+                <button id="btn-logout" class="px-3 py-2 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 rounded-lg font-bold transition-all text-xs flex items-center gap-1 h-[38px]">
+                    SALIDA
+                </button>
+            </div>
+        </div>
+
+        <!-- ── BARRA DE TABS (Solo visible para admin) ── -->
+        <div id="admin-tabs-bar" class="hidden w-full border-b border-gray-300 gap-1 mt-2">
+            <button class="tab-btn active px-6 py-2.5 text-sm font-bold border-b-2 border-unefablue text-unefablue transition-colors hover:bg-gray-50" data-target="tab-horario">📅 Horario</button>
+            <button class="tab-btn px-6 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-unefablue hover:border-unefablue/30 transition-colors hover:bg-gray-50" data-target="tab-stats">📊 Estadísticas</button>
+            <button class="tab-btn px-6 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-unefablue hover:border-unefablue/30 transition-colors hover:bg-gray-50" data-target="tab-users">👥 Usuarios</button>
+            <button class="tab-btn px-6 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-unefablue hover:border-unefablue/30 transition-colors hover:bg-gray-50" data-target="tab-sections">📋 Secciones</button>
+        </div>
+
+        <!-- ── CONTENEDOR DE PESTAÑAS ── -->
+        <div class="w-full relative">
+            
+            <!-- 🔹 TAB: HORARIO -->
+            <div id="tab-horario" class="tab-content block w-full opacity-100 transition-opacity duration-300">
+                
+                <!-- Acciones Rápidas (Búsqueda y Reset, solo admin) -->
+                <div id="admin-horario-actions" class="hidden w-full bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex-1 w-full max-w-md relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                        <input type="text" id="admin-search" class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-9 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-unefablue transition-all" placeholder="Buscar materia o docente en la grilla...">
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <button id="btn-reset-all" class="flex items-center gap-2 text-xs bg-red-50 hover:bg-red-600 text-red-600 hover:text-white px-4 py-2.5 rounded-lg font-bold transition-all border border-red-200">
+                            RESET TOTAL
+                        </button>
+                        <button id="btn-download-pdf" class="hidden items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all shadow-md">
+                            Descargar PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grilla Profesor -->
+                <div id="scheduler-container" class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden w-full opacity-40 pointer-events-none transition-opacity duration-300">
+                    <div class="bg-white border-b-2 border-gray-100 px-6 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-unefablue" id="grid-title">Disponibilidad de Horarios</h3>
+                            <p class="text-sm text-gray-500 mt-0.5" id="grid-subtitle">Selecciona Carrera, Semestre y Sección para comenzar.</p>
+                            <!-- Barra de Progreso -->
+                            <div id="progress-bar-wrap" class="hidden mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span id="progress-bar-label">0 / 0 franjas ocupadas</span>
+                                    <span id="progress-bar-pct" class="font-bold text-unefablue">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                                    <div id="progress-bar-fill" class="h-full rounded-full" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div id="status-indicator" class="hidden items-center gap-2 px-4 py-2 rounded-full bg-green-100 border border-green-200 text-green-700 text-xs font-bold whitespace-nowrap">
+                                <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                                SINCRONIZADO
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Leyenda (solo profesor) -->
+                    <div id="prof-legend" class="bg-gray-50 px-6 py-3 border-b border-gray-200 flex gap-6 text-xs font-bold text-gray-600 uppercase tracking-wider">
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-green-100 border border-green-300"></div> Disponible</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-unefablue"></div> Tu reserva</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-red-100 border border-red-300"></div> Ocupado</div>
+                    </div>
+                    <div class="p-4 md:p-6 overflow-x-auto">
+                        <table class="schedule-table w-full min-w-[540px] border-collapse text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="w-[130px] py-3 px-4 text-left text-xs text-gray-500 uppercase font-bold bg-gray-50 border border-gray-200">Hora</th>
+                                    <th class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">LUN</th>
+                                    <th class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">MAR</th>
+                                    <th class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">MIÉ</th>
+                                    <th class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">JUE</th>
+                                    <th class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">VIE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Grilla Admin -->
+                <div id="admin-schedule-view" class="hidden bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden w-full">
+                    <div id="pdf-capture-zone" class="p-6">
+                        <div class="text-center mb-4">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">AMPLIACIÓN: MARA</p>
+                            <h2 class="text-base font-extrabold text-unefablue mt-1" id="admin-schedule-title">CARRERA: — SEMESTRE: — SECCIÓN: —</h2>
+                            <div class="w-24 h-0.5 bg-unefagold mx-auto mt-2"></div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table id="admin-grid-table" class="w-full border-collapse text-xs font-semibold min-w-[600px]">
+                                <thead>
+                                    <tr>
+                                        <th class="admin-th">TURNO</th>
+                                        <th class="admin-th">HORA</th>
+                                        <th class="admin-th">LUNES</th>
+                                        <th class="admin-th">MARTES</th>
+                                        <th class="admin-th">MIÉRCOLES</th>
+                                        <th class="admin-th">JUEVES</th>
+                                        <th class="admin-th">VIERNES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-grid-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-extrabold text-unefablue uppercase tracking-wider border-b border-unefagold pb-1">📋 Registro de Docentes — Vista Consolidada</h4>
+                                <span class="text-xs text-gray-400 italic">Haz clic en un botón 'Liberar' de la grilla para vaciar el espacio</span>
+                            </div>
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+                                <table class="w-full border-collapse text-xs min-w-[650px]">
+                                    <thead>
+                                        <tr>
+                                            <th class="admin-th-sm text-left" style="min-width:130px">MATERIA</th>
+                                            <th class="admin-th-sm text-left" style="min-width:110px">DOCENTE</th>
+                                            <th class="admin-th-sm" style="min-width:80px">LUNES</th>
+                                            <th class="admin-th-sm" style="min-width:80px">MARTES</th>
+                                            <th class="admin-th-sm" style="min-width:80px">MIÉRCOLES</th>
+                                            <th class="admin-th-sm" style="min-width:80px">JUEVES</th>
+                                            <th class="admin-th-sm" style="min-width:80px">VIERNES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-summary-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 🔹 TAB: ESTADÍSTICAS -->
+            <div id="tab-stats" class="tab-content hidden w-full opacity-0 transition-opacity duration-300 bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-unefablue py-4 px-6 border-b-4 border-unefagold">
+                    <h2 class="text-lg font-bold text-white tracking-wide">📊 Estadísticas del Sistema</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Ocupación por Día</p>
+                        <canvas id="chart-by-day" height="200"></canvas>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Ocupación por Carrera</p>
+                        <canvas id="chart-by-career" height="200"></canvas>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Reservas por Docente</p>
+                        <canvas id="chart-by-prof" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔹 TAB: USUARIOS -->
+            <div id="tab-users" class="tab-content hidden w-full opacity-0 transition-opacity duration-300 bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-unefablue py-4 px-6 border-b-4 border-unefagold">
+                    <h2 class="text-lg font-bold text-white tracking-wide">👥 Gestión de Usuarios</h2>
+                    <p class="text-blue-200 text-xs mt-0.5">Crea y administra las cuentas de profesores</p>
+                </div>
+                <div class="p-6 flex flex-col md:flex-row gap-8">
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Cuentas activas (<span id="user-count">0</span>)</p>
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-xs border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="admin-th-sm text-left">Nombre</th>
+                                        <th class="admin-th-sm text-left">Usuario</th>
+                                        <th class="admin-th-sm">Rol</th>
+                                        <th class="admin-th-sm">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 bg-gray-50 p-5 rounded-xl border border-gray-200 h-fit">
+                        <p class="text-xs font-bold text-unefablue uppercase tracking-wider mb-4">➕ Nuevo Profesor</p>
+                        <form id="form-new-user" class="flex flex-col gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre completo</label>
+                                <input type="text" id="new-user-name" placeholder="Prof. Juan Pérez" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Usuario</label>
+                                <input type="text" id="new-user-username" placeholder="prof.juan" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Contraseña</label>
+                                <input type="text" id="new-user-password" placeholder="Mínimo 4 caracteres" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" required minlength="4">
+                            </div>
+                            <button type="submit" class="w-full bg-unefablue hover:bg-unefablueHover text-white font-bold py-2.5 rounded-lg transition-all text-sm mt-2 shadow-md">
+                                ✓ Crear cuenta
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔹 TAB: SECCIONES -->
+            <div id="tab-sections" class="tab-content hidden w-full opacity-0 transition-opacity duration-300 bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+                <div class="bg-unefablue py-4 px-6 border-b-4 border-unefagold">
+                    <h2 class="text-lg font-bold text-white tracking-wide">📋 Gestión de Secciones</h2>
+                    <p class="text-blue-200 text-xs mt-0.5">Crea secciones dinámicas por carrera y semestre</p>
+                </div>
+                <div class="p-6 flex flex-col md:flex-row gap-8">
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Secciones existentes (<span id="section-count">0</span>)</p>
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-xs border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="admin-th-sm text-left">Carrera</th>
+                                        <th class="admin-th-sm text-left">Semestre</th>
+                                        <th class="admin-th-sm text-left">Código</th>
+                                        <th class="admin-th-sm">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sections-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 bg-gray-50 p-5 rounded-xl border border-gray-200 h-fit">
+                        <p class="text-xs font-bold text-teal-700 uppercase tracking-wider mb-4">➕ Nueva Sección</p>
+                        <form id="form-new-section" class="flex flex-col gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Carrera</label>
+                                <select id="section-career" class="select-unefa w-full bg-white" required>
+                                    <option value="" disabled selected>--</option>
+                                    <option value="sistemas">Ing. Sistemas</option>
+                                    <option value="enfermeria">Enfermería</option>
+                                    <option value="administracion">Administración</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Semestre</label>
+                                <select id="section-semester" class="select-unefa w-full bg-white" required>
+                                    <option value="" disabled selected>--</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Código</label>
+                                <input type="text" id="section-code" placeholder="04S-2626D4" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unefablue" required>
+                            </div>
+                            <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-lg transition-all text-sm mt-2 shadow-md">
+                                ✓ Crear Sección
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
