@@ -212,7 +212,7 @@ app.post('/api/reservations', authRequired, async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, message: 'Error al reservar.' });
+        res.status(500).json({ success: false, message: 'DB Error: ' + err.message });
     }
 });
 
