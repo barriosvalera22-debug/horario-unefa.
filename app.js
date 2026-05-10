@@ -720,7 +720,7 @@ function buildGroupedSummary(summaryBody) {
 
     TIME_SLOTS.forEach((_, idx) => {
         DAYS.forEach(day => {
-            const slot = db.getSlot(adminCareer, adminSemester, day.id, idx);
+            const slot = db.getSlot(adminCareer, adminSemester, adminSection, day.id, idx);
             if (!slot) return;
             const key = `${slot.materia}||${slot.prof}`;
             if (!groups[key]) {
