@@ -230,7 +230,7 @@ const queries = {
             const row = db.prepare('SELECT prof, materia, classroom FROM reservations WHERE key = ?').get(key);
             return row || null;
         }
-        const [rows] = await pool.query('SELECT prof, materia, classroom FROM reservations WHERE key = ?', [key]);
+        const [rows] = await pool.query('SELECT prof, materia, classroom FROM reservations WHERE `key` = ?', [key]);
         return rows[0] || null;
     },
     insertReservation: async (key, career, semester, section, day, slotIdx, prof, materia, classroom) => {
