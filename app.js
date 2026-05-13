@@ -676,7 +676,7 @@ function renderAdminSchedule() {
     const semesterLabel = SEMESTERS[parseInt(adminSemester)] || '—';
 
     document.getElementById('admin-schedule-title').textContent =
-        `CARRERA: ${careerLabel.toUpperCase()}   —   ${semesterLabel.toUpperCase()}   —   ${adminSection}`;
+        `CARRERA: ${careerLabel.toUpperCase()} — ${adminSection}`;
     gridTitle.textContent = careerLabel;
     gridSubtitle.textContent = `Vista institucional — ${semesterLabel} — ${adminSection}`;
 
