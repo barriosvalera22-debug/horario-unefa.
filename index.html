@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNEFA — Ampliación Mara | Sistema de Gestión de Horarios</title>
+    <title>UNEFA Núcleo Zulia - Ampliación Mara | Sistema de Gestión de Horarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Librerías PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -60,7 +60,7 @@
         <div class="relative z-10 text-center flex-1 px-3">
             <h1 class="text-sm md:text-2xl font-extrabold tracking-wide drop-shadow-md leading-tight">
                 <span id="header-title-text" title="Doble clic para editar el nombre"
-                    ondblclick="makeHeaderEditable(this)">UNEFA — AMPLIACIÓN MARA</span>
+                    ondblclick="makeHeaderEditable(this)">UNEFA NÚCLEO ZULIA - AMPLIACIÓN MARA</span>
             </h1>
             <p class="text-unefagold text-xs font-semibold tracking-widest uppercase hidden md:block mt-0.5 opacity-90">
                 Sistema de Gestión de Horarios
@@ -148,6 +148,12 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
                         <input type="text" id="reg-name" placeholder="Prof. María García"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-unefablue transition-all"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cédula de Identidad</label>
+                        <input type="text" id="reg-cedula" placeholder="V-12345678"
                             class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-unefablue transition-all"
                             required>
                     </div>
@@ -368,6 +374,9 @@
                                     <th
                                         class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">
                                         VIE</th>
+                                    <th
+                                        class="py-3 px-2 text-center text-xs text-white font-bold bg-unefablue border border-blue-900/50">
+                                        SÁB</th>
                                 </tr>
                             </thead>
                             <tbody id="schedule-body"></tbody>
@@ -382,7 +391,7 @@
                     <div id="pdf-capture-zone" class="p-6">
                         <!-- Encabezado institucional del PDF -->
                         <div class="text-center mb-4">
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">AMPLIACIÓN: MARA</p>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">NÚCLEO ZULIA - AMPLIACIÓN MARA</p>
                             <h2 class="text-base font-extrabold text-unefablue mt-1" id="admin-schedule-title">CARRERA:
                                 — SEMESTRE: —</h2>
                             <div class="w-24 h-0.5 bg-unefagold mx-auto mt-2"></div>
@@ -401,6 +410,7 @@
                                         <th class="admin-th">MIÉRCOLES</th>
                                         <th class="admin-th">JUEVES</th>
                                         <th class="admin-th">VIERNES</th>
+                                        <th class="admin-th">SÁBADO</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-grid-body">
@@ -430,6 +440,7 @@
                                             <th class="admin-th-sm" style="min-width:80px">MIÉRCOLES</th>
                                             <th class="admin-th-sm" style="min-width:80px">JUEVES</th>
                                             <th class="admin-th-sm" style="min-width:80px">VIERNES</th>
+                                            <th class="admin-th-sm" style="min-width:80px">SÁBADO</th>
                                         </tr>
                                     </thead>
                                     <tbody id="admin-summary-body"></tbody>
@@ -477,6 +488,15 @@
                     <input type="text" id="modal-classroom"
                         class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-unefablue transition-all text-sm"
                         placeholder="Ej: Aula 14, Lab. Computación..." required autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Cantidad de Horas (Continuas)</label>
+                    <select id="modal-blocks" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-unefablue transition-all text-sm">
+                        <option value="1">1 Hora (Una sola franja)</option>
+                        <option value="2">2 Horas (Bloque doble)</option>
+                        <option value="3">3 Horas (Bloque triple)</option>
+                        <option value="4">4 Horas (Bloque cuádruple)</option>
+                    </select>
                 </div>
                 <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-700">
                     <strong>Nota:</strong> Esta materia quedará asociada a tu nombre y al horario seleccionado. Los
@@ -669,7 +689,7 @@
     <!-- FOOTER: Créditos -->
     <footer class="bg-white/80 backdrop-blur-sm border-t border-gray-200 py-6 mt-10">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">Desarrollado por</p>
+            <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">Diseñado por</p>
             <p class="text-unefablue font-bold text-sm">Leonardo David Barrios Valera</p>
             <p class="text-gray-400 text-[10px] italic">Estudiante de Ingeniería de Sistemas | 4to Semestre</p>
         </div>

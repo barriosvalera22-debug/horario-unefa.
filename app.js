@@ -12,14 +12,14 @@ const SEMESTERS = [
 ];
 
 const TIME_SLOTS = [
-    '07:00 - 07:45', '07:45 - 08:30', '08:30 - 09:15', '09:15 - 10:00',
+    '07:45 - 08:30', '08:30 - 09:15', '09:15 - 10:00',
     '10:00 - 10:45', '10:45 - 11:30', '11:30 - 12:15', '12:15 - 13:00',
     '13:00 - 13:45', '13:45 - 14:30', '14:30 - 15:15', '15:15 - 16:00',
     '16:00 - 16:45', '16:45 - 17:30', '17:30 - 18:15', '18:15 - 19:00',
     '19:00 - 19:45', '19:45 - 20:30',
 ];
 
-const MORNING_END_IDX = 7; // índices 0–7 = MAÑANA, 8+ = TARDE
+const MORNING_END_IDX = 6; // índices 0–6 = MAÑANA, 7+ = TARDE
 
 const DAYS = [
     { id: 'lunes', label: 'LUNES' },
@@ -27,6 +27,7 @@ const DAYS = [
     { id: 'miercoles', label: 'MIÉRCOLES' },
     { id: 'jueves', label: 'JUEVES' },
     { id: 'viernes', label: 'VIERNES' },
+    { id: 'sabado', label: 'SÁBADO' },
 ];
 
 const CAREERS_MAP = {
@@ -313,16 +314,19 @@ document.getElementById('btn-go-login')?.addEventListener('click', () => {
 document.getElementById('form-register')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name     = document.getElementById('reg-name').value.trim();
+    const cedula   = document.getElementById('reg-cedula').value.trim();
     const username = document.getElementById('reg-username').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
 
-    if (!name || !username || password.length < 4) return;
+    if (!name || !cedula || !username || password.length < 4) return;
+
+    const fullName = `${name} (C.I: ${cedula})`;
 
     try {
         const res = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, name })
+            body: JSON.stringify({ username, password, name: fullName })
         });
         const data = await res.json();
         if (!data.success) {
@@ -333,9 +337,9 @@ document.getElementById('form-register')?.addEventListener('submit', async (e) =
         if (data.token) localStorage.setItem('jwt_token', data.token);
     } catch (e) { showToast('Error de conexión', '', 'error'); return; }
 
-    showToast('✅ Cuenta creada', `${name} — ya puedes iniciar sesión`, 'success');
+    showToast('✅ Cuenta creada', `${fullName} — ya puedes iniciar sesión`, 'success');
 
-    currentUser = { name, role: 'professor', username };
+    currentUser = { name: fullName, role: 'professor', username };
     localStorage.setItem('user_data', JSON.stringify(currentUser));
     await db.fetchAll();
     document.getElementById('profile-name').textContent = currentUser.name;
@@ -358,6 +362,8 @@ function openModal(dayId, slotIdx) {
     modalInfo.textContent = `${dayObj.label} | ${TIME_SLOTS[slotIdx]}`;
     modalMateria.value = '';
     if (modalClassroom) modalClassroom.value = '';
+    const modalBlocks = document.getElementById('modal-blocks');
+    if (modalBlocks) modalBlocks.value = '1';
     modalReservar.classList.remove('hidden');
     setTimeout(() => modalMateria.focus(), 100);
 }
@@ -375,22 +381,52 @@ modalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const materia = modalMateria.value.trim();
     const classroom = modalClassroom ? modalClassroom.value.trim() : '';
+    const modalBlocks = document.getElementById('modal-blocks');
+    const numBlocks = modalBlocks ? parseInt(modalBlocks.value) : 1;
+
     if (!materia || !classroom || !pendingSlot) return;
 
     const { dayId, slotIdx } = pendingSlot;
     const dayObj = DAYS.find(d => d.id === dayId);
-    const result = await db.reserve(currentCareer, currentSemester, currentSection, dayId, slotIdx, currentUser.name, materia, classroom);
+    
+    let reservedCount = 0;
+    let failReason = null;
 
-    if (result.success) {
+    for (let i = 0; i < numBlocks; i++) {
+        const currentIdx = slotIdx + i;
+        if (currentIdx >= TIME_SLOTS.length) break;
+        if (currentIdx === 6) {
+            if (numBlocks > 1) failReason = 'Se detuvo al llegar al receso.';
+            break; 
+        }
+        
+        const existing = db.getSlot(currentCareer, currentSemester, currentSection, dayId, currentIdx);
+        if (existing) {
+            if (numBlocks > 1) failReason = 'Se detuvo al encontrar un bloque ocupado.';
+            break;
+        }
+        
+        const result = await db.reserve(currentCareer, currentSemester, currentSection, dayId, currentIdx, currentUser.name, materia, classroom);
+        if (result.success) reservedCount++;
+        else {
+            failReason = result.message;
+            break;
+        }
+    }
+
+    if (reservedCount > 0) {
         showToast(
             `Reservado: <strong>${materia}</strong>`,
-            `${dayObj.label} · ${TIME_SLOTS[slotIdx]} · 📍 ${classroom}`,
+            `${dayObj.label} · ${reservedCount} franja(s) · 📍 ${classroom}`,
             'success'
         );
+        if (failReason) {
+            setTimeout(() => showToast('Aviso', `Solo se reservaron ${reservedCount} franjas. ${failReason}`, 'info'), 500);
+        }
         renderGrid();
         updateProgressBar();
     } else {
-        showToast('No se pudo reservar', result.message || 'Este espacio fue tomado.', 'error');
+        showToast('No se pudo reservar', failReason || 'El espacio no está disponible.', 'error');
     }
     closeModal();
 });
@@ -461,7 +497,7 @@ function setSchedulerActive(active) {
     if (active) {
         schedulerCont.classList.remove('opacity-40', 'pointer-events-none');
         statusIndicator.classList.remove('hidden'); statusIndicator.classList.add('flex');
-        gridTitle.textContent = `${CAREERS_MAP[currentCareer]} — ${SEMESTERS[currentSemester]} — ${currentSection}`;
+        gridTitle.textContent = `${CAREERS_MAP[currentCareer]} — ${currentSection}`;
         gridSubtitle.textContent = 'Haz clic en una celda disponible para reservar tu franja horaria.';
     } else {
         schedulerCont.classList.add('opacity-40', 'pointer-events-none');
@@ -481,48 +517,68 @@ function renderGrid() {
         tdTime.className = 'time-cell'; tdTime.textContent = timeLabel;
         tr.appendChild(tdTime);
 
-        DAYS.forEach(day => {
-            const slot = db.getSlot(currentCareer, currentSemester, currentSection, day.id, idx);
-            const isOccupied = slot !== null;
-            const isMine = isOccupied && slot.prof === currentUser.name;
+        if (idx === 6) {
+            const td = document.createElement('td');
+            td.colSpan = 6;
+            td.className = 'bg-gray-100 text-center py-2 border border-gray-200 shadow-inner';
+            td.innerHTML = '<span class="text-sm font-extrabold text-gray-500 uppercase tracking-[0.4em]">☕ RECESO</span>';
+            tr.appendChild(td);
+        } else {
+            DAYS.forEach(day => {
+                if (idx === 0 && day.id === 'lunes') {
+                    const td = document.createElement('td'); td.className = 'slot-cell';
+                    const btn = document.createElement('button');
+                    btn.className = 'slot-btn state-taken flex flex-col items-center justify-center !bg-yellow-50 !border-yellow-200';
+                    btn.disabled = true;
+                    btn.title = 'Acto Cívico Institucional';
+                    btn.innerHTML = `<span class="slot-materia-text text-yellow-700">🇻🇪 ACTO CÍVICO</span>
+                                     <div class="text-[9px] mt-0.5 font-bold text-yellow-600 leading-tight">Obligatorio</div>`;
+                    td.appendChild(btn); tr.appendChild(td);
+                    return;
+                }
 
-            const td = document.createElement('td'); td.className = 'slot-cell';
-            const btn = document.createElement('button');
+                const slot = db.getSlot(currentCareer, currentSemester, currentSection, day.id, idx);
+                const isOccupied = slot !== null;
+                const isMine = isOccupied && slot.prof === currentUser.name;
 
-            if (isMine) {
-                // ── Mi reserva (azul) ──
-                btn.className = 'slot-btn state-mine flex flex-col items-center justify-center';
-                btn.title = `${slot.materia} — click para liberar`;
-                btn.innerHTML = `<span class="slot-materia-text">✓ ${slot.materia}</span>
-                                 <div class="text-[9px] mt-0.5 font-normal opacity-80 leading-tight">📍 ${slot.classroom || 'Sin Aula'}</div>`;
-                btn.onclick = async () => {
-                    if (confirm(`¿Liberar "${slot.materia}" el ${day.label} ${timeLabel}?`)) {
-                        await db.free(currentCareer, currentSemester, currentSection, day.id, idx);
-                        showToast(
-                            `Liberado: <strong>${slot.materia}</strong>`,
-                            `${day.label} · ${timeLabel}`,
-                            'info'
-                        );
-                        renderGrid();
-                        updateProgressBar();
-                    }
-                };
-            } else if (isOccupied) {
-                // ── Tomado por otro (rojo) ──
-                btn.className = 'slot-btn state-taken flex flex-col items-center justify-center';
-                btn.disabled = true;
-                btn.title = `${slot.materia} — ${slot.prof}`;
-                btn.innerHTML = `<span class="slot-materia-text">${slot.materia}</span>
-                                 <div class="text-[9px] mt-0.5 font-normal opacity-80 leading-tight">📍 ${slot.classroom || 'Sin Aula'}</div>`;
-            } else {
-                // ── Libre (verde) ──
-                btn.className = 'slot-btn state-free';
-                btn.title = 'Disponible — clic para reservar';
-                btn.onclick = () => openModal(day.id, idx);
-            }
+                const td = document.createElement('td'); td.className = 'slot-cell';
+                const btn = document.createElement('button');
 
-            td.appendChild(btn); tr.appendChild(td);
-        });
+                if (isMine) {
+                    // ── Mi reserva (azul) ──
+                    btn.className = 'slot-btn state-mine flex flex-col items-center justify-center';
+                    btn.title = `${slot.materia} — click para liberar`;
+                    btn.innerHTML = `<span class="slot-materia-text">✓ ${slot.materia}</span>
+                                     <div class="text-[9px] mt-0.5 font-normal opacity-80 leading-tight">📍 ${slot.classroom || 'Sin Aula'}</div>`;
+                    btn.onclick = async () => {
+                        if (confirm(`¿Liberar "${slot.materia}" el ${day.label} ${timeLabel}?`)) {
+                            await db.free(currentCareer, currentSemester, currentSection, day.id, idx);
+                            showToast(
+                                `Liberado: <strong>${slot.materia}</strong>`,
+                                `${day.label} · ${timeLabel}`,
+                                'info'
+                            );
+                            renderGrid();
+                            updateProgressBar();
+                        }
+                    };
+                } else if (isOccupied) {
+                    // ── Tomado por otro (rojo) ──
+                    btn.className = 'slot-btn state-taken flex flex-col items-center justify-center';
+                    btn.disabled = true;
+                    btn.title = `${slot.materia} — ${slot.prof}`;
+                    btn.innerHTML = `<span class="slot-materia-text">${slot.materia}</span>
+                                     <div class="text-[9px] mt-0.5 font-normal opacity-80 leading-tight">📍 ${slot.classroom || 'Sin Aula'}</div>`;
+                } else {
+                    // ── Libre (verde) ──
+                    btn.className = 'slot-btn state-free';
+                    btn.title = 'Disponible — clic para reservar';
+                    btn.onclick = () => openModal(day.id, idx);
+                }
+
+                td.appendChild(btn); tr.appendChild(td);
+            });
+        }
         scheduleBody.appendChild(tr);
     });
 }
@@ -653,51 +709,68 @@ function renderAdminSchedule() {
         tr.appendChild(tdHora);
 
         // DÍAS
-        DAYS.forEach(day => {
-            const slot = db.getSlot(adminCareer, adminSemester, adminSection, day.id, idx);
+        if (idx === 6) {
             const td = document.createElement('td');
-            td.className = `admin-td-slot ${slot ? 'occupied' : 'free'}`;
-
-            if (slot) {
-                // ✅ MEJORA 3: botón de liberar slot visible al hacer hover
-                const btnFree = document.createElement('button');
-                btnFree.className = 'btn-admin-free';
-                btnFree.textContent = '✕ Liberar';
-                btnFree.onclick = async (e) => {
-                    e.stopPropagation();
-                    if (confirm(`¿Liberar "${slot.materia}" (${slot.prof}) del ${day.label} ${timeLabel}?`)) {
-                        await db.free(adminCareer, adminSemester, adminSection, day.id, idx);
-                        showToast(
-                            `Slot liberado: <strong>${slot.materia}</strong>`,
-                            `${day.label} · ${timeLabel} · ${slot.prof}`,
-                            'warning'
-                        );
-                        renderAdminSchedule();
-                    }
-                };
-
-                // Texto materia + prof + aula + botón
-                const materiaSpan = document.createElement('span');
-                materiaSpan.className = 'admin-slot-materia';
-                materiaSpan.textContent = slot.materia.toUpperCase();
-
-                const profSpan = document.createElement('span');
-                profSpan.className = 'admin-slot-prof';
-                profSpan.textContent = slot.prof;
-
-                const classSpan = document.createElement('span');
-                classSpan.className = 'text-[9px] font-normal opacity-80 mt-0.5 text-unefablue leading-tight';
-                classSpan.textContent = `📍 ${slot.classroom || 'Sin Aula'}`;
-
-                td.appendChild(materiaSpan);
-                td.appendChild(profSpan);
-                td.appendChild(classSpan);
-                td.appendChild(btnFree);
-
-                summaryRows.push({ day: day.label, time: timeLabel, prof: slot.prof, materia: slot.materia });
-            }
+            td.colSpan = 6;
+            td.className = 'bg-gray-100 text-center py-2 border border-gray-200';
+            td.innerHTML = '<span class="text-xs font-extrabold text-gray-500 uppercase tracking-[0.4em]">☕ RECESO</span>';
             tr.appendChild(td);
-        });
+        } else {
+            DAYS.forEach(day => {
+                if (idx === 0 && day.id === 'lunes') {
+                    const td = document.createElement('td');
+                    td.className = 'admin-td-slot occupied !bg-yellow-50';
+                    td.innerHTML = `<span class="admin-slot-materia text-yellow-700" style="font-size: 0.65rem; font-weight: 900;">🇻🇪 ACTO CÍVICO</span>
+                                    <span class="admin-slot-prof text-yellow-600 mt-1">Institucional</span>`;
+                    tr.appendChild(td);
+                    return;
+                }
+
+                const slot = db.getSlot(adminCareer, adminSemester, adminSection, day.id, idx);
+                const td = document.createElement('td');
+                td.className = `admin-td-slot ${slot ? 'occupied' : 'free'}`;
+
+                if (slot) {
+                    // ✅ MEJORA 3: botón de liberar slot visible al hacer hover
+                    const btnFree = document.createElement('button');
+                    btnFree.className = 'btn-admin-free';
+                    btnFree.textContent = '✕ Liberar';
+                    btnFree.onclick = async (e) => {
+                        e.stopPropagation();
+                        if (confirm(`¿Liberar "${slot.materia}" (${slot.prof}) del ${day.label} ${timeLabel}?`)) {
+                            await db.free(adminCareer, adminSemester, adminSection, day.id, idx);
+                            showToast(
+                                `Slot liberado: <strong>${slot.materia}</strong>`,
+                                `${day.label} · ${timeLabel} · ${slot.prof}`,
+                                'warning'
+                            );
+                            renderAdminSchedule();
+                        }
+                    };
+
+                    // Texto materia + prof + aula + botón
+                    const materiaSpan = document.createElement('span');
+                    materiaSpan.className = 'admin-slot-materia';
+                    materiaSpan.textContent = slot.materia.toUpperCase();
+
+                    const profSpan = document.createElement('span');
+                    profSpan.className = 'admin-slot-prof';
+                    profSpan.textContent = slot.prof;
+
+                    const classSpan = document.createElement('span');
+                    classSpan.className = 'text-[9px] font-normal opacity-80 mt-0.5 text-unefablue leading-tight';
+                    classSpan.textContent = `📍 ${slot.classroom || 'Sin Aula'}`;
+
+                    td.appendChild(materiaSpan);
+                    td.appendChild(profSpan);
+                    td.appendChild(classSpan);
+                    td.appendChild(btnFree);
+
+                    summaryRows.push({ day: day.label, time: timeLabel, prof: slot.prof, materia: slot.materia });
+                }
+                tr.appendChild(td);
+            });
+        }
 
         tbody.appendChild(tr);
     });
@@ -734,7 +807,7 @@ function buildGroupedSummary(summaryBody) {
     const entries = Object.values(groups);
 
     if (entries.length === 0) {
-        summaryBody.innerHTML = `<tr><td colspan="7" class="admin-td-sm text-gray-400 py-8 text-center">Sin reservas registradas para este semestre.</td></tr>`;
+        summaryBody.innerHTML = `<tr><td colspan="8" class="admin-td-sm text-gray-400 py-8 text-center">Sin reservas registradas para este semestre.</td></tr>`;
         return;
     }
 
@@ -945,7 +1018,7 @@ function updateProgressBar() {
     const wrap = document.getElementById('progress-bar-wrap');
     if (!wrap || !currentCareer || currentSemester === '') return;
     const prefix = `${currentCareer}__${currentSemester}__`;
-    const total = TIME_SLOTS.length * DAYS.length;
+    const total = ((TIME_SLOTS.length - 1) * DAYS.length) - 1; // Restamos 1 por la franja de receso y 1 acto cívico
     const occupied = Object.keys(db.getAll()).filter(k => k.startsWith(prefix)).length;
     const pct = Math.round((occupied / total) * 100);
     document.getElementById('progress-bar-fill').style.width = pct + '%';
